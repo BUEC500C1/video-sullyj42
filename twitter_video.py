@@ -9,6 +9,6 @@ So we will continue to call this portion of the code incrementally.
 Calls Google Vision in a queue structure as that is the most time-consuming portion of this
 '''
 
-import api-design-sullyj42.tweet_import.py as tweet_import
+import api_design_sullyj42 as twitterTools
 
 print('hello world')

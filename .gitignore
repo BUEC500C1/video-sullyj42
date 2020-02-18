@@ -1,0 +1,20 @@
+*.token
+*.asv
+*.pyc
+*.json
+images/*
+!images/samples/*
+output/*
+.DS*
+temp*
+*.orig # Results from astyle
+*.ORIG # Results from astyle
+!output/examples
+!output/examples/*
+secrets/*
+build/*
+lib*
+*cache*
+*.egg*
+dist/*
+.DS*
