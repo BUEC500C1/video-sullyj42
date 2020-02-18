@@ -8,11 +8,12 @@ import threading
 from time import sleep
 from twittertools.tweet_import import tweet_import
 from twittertools.make_word_cloud import word_cloud_from_txt
-
+from copy import deepcopy
 def do_twitter_analysis(item):
     print(f'working ...')
     item.classify_images()
     word_cloud_from_txt(item.write_summaryfile())
+    print(f'done')
 
 def work_twitterdata():
     print('Initiating work')
@@ -50,29 +51,14 @@ class queue_twitter_summary():
         # a.analyzeUsername('brabbott42', range(0, 1000, 200))
         tweets = []
         for i in range(pages):
-            tweets.append(tweetClass.analyzeUsername(username, tweetcount=20))
+            tweetClass.analyzeUsername(username, tweetcount=20)
+            tweets.append(deepcopy(tweetClass))
             # This updates the page number incrementally
-        print('done')
+        print('Tweets retrieved')
 
-        source = tweets
-        for i in range(maxque):
-            t = threading.Thread(target=work_twitterdata)
-            t.start()
-            threads.append(t)
-
-        for item in source:
-            print('Inserting item')
-            q.put(item)
-
-        # block until all tasks are done
-        q.join()
-
-        # stop workers
-        for i in range(maxque):
-            q.put(None)
-        for t in threads:
-            t.join()
-
+            
+        for tweet in tweets:
+            do_twitter_analysis(tweet)
 '''
         # tweetClass.classify_images()
         # word_cloud_from_txt(tweetClass.write_summaryfile())
