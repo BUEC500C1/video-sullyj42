@@ -8,22 +8,55 @@ import threading
 from time import sleep
 from twittertools.tweet_import import tweet_import
 from twittertools.make_word_cloud import word_cloud_from_txt
-from copy import deepcopy
-def do_twitter_analysis(item):
-    print(f'working ...')
+from copy import deepcopy 
+# Used to save the twitter instances for distributed processing
+'''
+    Example of how to wait for enqueued tasks to be completed:
+
+    def worker():
+        while True:
+            item = q.get()
+            if item is None:
+                break
+            do_work(item)
+            q.task_done()
+
+    q = queue.Queue()
+    threads = []
+    for i in range(num_worker_threads):
+        t = threading.Thread(target=worker)
+        t.start()
+        threads.append(t)
+
+    for item in source():
+        q.put(item)
+
+    # block until all tasks are done
+    q.join()
+
+    # stop workers
+    for i in range(num_worker_threads):
+        q.put(None)
+    for t in threads:
+        t.join()
+'''
+
+def do_twitter_analysis(item):  # do_work
+    # print(f'working ...')
     item.classify_images()
     word_cloud_from_txt(item.write_summaryfile())
-    print(f'done')
+    # print(f'done')
 
-def work_twitterdata():
-    print('Initiating work')
+def work_twitterdata(q):  # worker
+    # print('Initiating work')
     while True:
         item = q.get()
         if item is None:
+            print('recieved empty')
             break
-        # do_twitter_analysis(item)
-        print(item)
-        sleep(2)
+        else:
+            print(f'Recieved: {item}')
+            do_twitter_analysis(item)
         q.task_done()
 
 
@@ -42,23 +75,45 @@ class queue_twitter_summary():
     def __init__(self):
 
         maxque = 3
-        q = Queue(maxsize=maxque) 
+        q = Queue() 
         threads = []
         username = 'brabbott42'
-        pages = 3
+        pages = 5
 
         tweetClass = tweet_import()
         # a.analyzeUsername('brabbott42', range(0, 1000, 200))
         tweets = []
         for i in range(pages):
-            tweetClass.analyzeUsername(username, tweetcount=20)
+            tweetClass.analyzeUsername(username, tweetcount=10)
             tweets.append(deepcopy(tweetClass))
             # This updates the page number incrementally
         print('Tweets retrieved')
 
-            
-        for tweet in tweets:
-            do_twitter_analysis(tweet)
+        # Iterative approach 
+        # for tweet in tweets:
+        #     do_twitter_analysis(tweet)
+        threads = []
+        for i in range(maxque):
+            t = threading.Thread(target=work_twitterdata, args=(q,))
+            t.start()
+            threads.append(t)
+        print('Threads created, printing tweet states')
+        for item in tweets:
+            print(item)
+            print(item is None)
+            q.put(item)
+        print('items placed')
+        # block until all tasks are done
+        q.join()
+        print('queue joined')
+
+        # stop workers
+        for i in range(3):
+            q.put(None)
+        for t in threads:
+            t.join()
+
+
 '''
         # tweetClass.classify_images()
         # word_cloud_from_txt(tweetClass.write_summaryfile())
