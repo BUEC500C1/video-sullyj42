@@ -43,14 +43,18 @@ from sys import stderr
         t.join()
 '''
 
-def do_twitter_analysis(tweet_obj, image_files, summary_file):  # do_work
+def do_twitter_analysis(tweet_obj):  
+    '''
+    Perform the time consuming analysis steps done after the twitter API
+
+    This involves working with images and Google Vision
+    ''' 
+    #, image_files=[], summary_file=[]):  # do_work
     # print(f'working ...')
-    labels = tweet_obj.classify_images(images=image_files)  # Makes requests to Google Vision
-    print('classified images and obtained labels')
-    print(f'Generated a set of labels: {labels}', sep=', ', end='[end]\n')
-    outfile = tweet_obj.write_summaryfile(summary_file)  # Combines tweets, labels into summary
+    tweet_obj.classify_images()  # Makes requests to Google Vision
+    outfile = tweet_obj.write_summaryfile()  # Combines tweets, labels into summary
     if not isfile(outfile):
-        print(f'output file not properly created: {outfile}')
+        print(f'\n\n--output file ({outfile}) not found--', file=stderr)
         return
     else:
         word_cloud_from_txt(outfile)  # 
@@ -93,16 +97,26 @@ class queue_twitter_summary():
 
         tweetClass = tweet_import()
         # a.analyzeUsername('brabbott42', range(0, 1000, 200))
+        '''
+        More user friendly approaches
         imagesets = []
         summaries = []
+        outdirs   = []
+        '''
+        tweetobjs = [] # Copy the whole object...
         for i in range(pages):
-            temp_images, temp_summaries = tweetClass.analyzeUsername(username, tweetcount=10)
-            summaries.append(temp_summaries)
-            imagesets.append(temp_images)
+            tweetClass.analyzeUsername(username, tweetcount=10)
+            tweetobjs.append(deepcopy(tweetClass))
+            # Grab a 
+            '''
+            More clear approaches
+            # summaries.append(tweetClass.tweet_text)
+            # imagesets.append(tweetClass.images)
+            # outdirs.append(tweetClass.curFolder)
             # imagesets.append(output.image_files)
             # summaries.append(output.clean_tweet_file)
             # This updates the page number incrementally
-        print('Tweets retrieved')
+            '''
         '''
         # Iterative approach (no threads required)
         for tweet in tweets:
@@ -114,6 +128,7 @@ class queue_twitter_summary():
         #     t.start()
         #     threads.append(t)
         # print('Threads created, printing tweet states')
+        '''
         for imageFiles in imagesets:
             print(*imageFiles, sep='\n', end='[end]\n')
         print('\nsummaries\n')
@@ -123,9 +138,9 @@ class queue_twitter_summary():
                   f'summaries ({len(summaries)}) and images ({len(imagesets)})',
                   file=stderr)
             raise Exception
-        tweetClass.image_files = []
-        for i in range(len(imagesets)):
-            do_twitter_analysis(tweetClass, imagesets[i], summaries[i])
+        '''
+        for obj in tweetobjs:
+            do_twitter_analysis(obj)
             # q.put(tweet, block=True, timeout=1)
         # print('items placed')
         # # block until all tasks are done
