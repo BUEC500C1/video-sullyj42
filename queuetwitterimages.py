@@ -3,12 +3,14 @@
 # queue using queue module 
   
   
-from queue import Queue 
+import queue 
 import threading
 from time import sleep
 from twittertools.tweet_import import tweet_import
 from twittertools.make_word_cloud import word_cloud_from_txt
-from copy import deepcopy 
+from copy import deepcopy
+from os.path import isfile
+from sys import stderr
 # Used to save the twitter instances for distributed processing
 '''
     Example of how to wait for enqueued tasks to be completed:
@@ -41,23 +43,32 @@ from copy import deepcopy
         t.join()
 '''
 
-def do_twitter_analysis(item):  # do_work
+def do_twitter_analysis(tweet_obj, image_files, summary_file):  # do_work
     # print(f'working ...')
-    item.classify_images()
-    word_cloud_from_txt(item.write_summaryfile())
+    labels = tweet_obj.classify_images(images=image_files)  # Makes requests to Google Vision
+    print('classified images and obtained labels')
+    print(f'Generated a set of labels: {labels}', sep=', ', end='[end]\n')
+    outfile = tweet_obj.write_summaryfile(summary_file)  # Combines tweets, labels into summary
+    if not isfile(outfile):
+        print(f'output file not properly created: {outfile}')
+        return
+    else:
+        word_cloud_from_txt(outfile)  # 
     # print(f'done')
 
 def work_twitterdata(q):  # worker
     # print('Initiating work')
     while True:
-        item = q.get()
-        if item is None:
-            print('recieved empty')
-            break
+        try:
+            print('Trying to get item')
+            item = q.get(block=True,timeout=2)
+        except queue.Empty:
+            print('passing on empty queue')
+            pass
         else:
             print(f'Recieved: {item}')
             do_twitter_analysis(item)
-        q.task_done()
+            q.task_done()
 
 
 
@@ -74,44 +85,61 @@ class queue_twitter_summary():
     '''
     def __init__(self):
 
-        maxque = 3
-        q = Queue() 
+        maxque = 5
+        q = queue.Queue() 
         threads = []
         username = 'brabbott42'
         pages = 5
 
         tweetClass = tweet_import()
         # a.analyzeUsername('brabbott42', range(0, 1000, 200))
-        tweets = []
+        imagesets = []
+        summaries = []
         for i in range(pages):
-            tweetClass.analyzeUsername(username, tweetcount=10)
-            tweets.append(deepcopy(tweetClass))
+            temp_images, temp_summaries = tweetClass.analyzeUsername(username, tweetcount=10)
+            summaries.append(temp_summaries)
+            imagesets.append(temp_images)
+            # imagesets.append(output.image_files)
+            # summaries.append(output.clean_tweet_file)
             # This updates the page number incrementally
         print('Tweets retrieved')
-
-        # Iterative approach 
-        # for tweet in tweets:
-        #     do_twitter_analysis(tweet)
+        '''
+        # Iterative approach (no threads required)
+        for tweet in tweets:
+            do_twitter_analysis()
+        '''
         threads = []
-        for i in range(maxque):
-            t = threading.Thread(target=work_twitterdata, args=(q,))
-            t.start()
-            threads.append(t)
-        print('Threads created, printing tweet states')
-        for item in tweets:
-            print(item)
-            print(item is None)
-            q.put(item)
-        print('items placed')
-        # block until all tasks are done
-        q.join()
-        print('queue joined')
+        # for i in range(2):
+        #     t = threading.Thread(target=work_twitterdata, args=(q,))
+        #     t.start()
+        #     threads.append(t)
+        # print('Threads created, printing tweet states')
+        for imageFiles in imagesets:
+            print(*imageFiles, sep='\n', end='[end]\n')
+        print('\nsummaries\n')
+        print(*summaries, sep='\n')
+        if len(summaries) != len(imagesets):
+            print(f'Expected a list of length {pages} (pages) for'+ \
+                  f'summaries ({len(summaries)}) and images ({len(imagesets)})',
+                  file=stderr)
+            raise Exception
+        tweetClass.image_files = []
+        for i in range(len(imagesets)):
+            do_twitter_analysis(tweetClass, imagesets[i], summaries[i])
+            # q.put(tweet, block=True, timeout=1)
+        # print('items placed')
+        # # block until all tasks are done
+        # print('joining items')
+        # q.join()
+        # print('queue joined')
 
-        # stop workers
-        for i in range(3):
-            q.put(None)
-        for t in threads:
-            t.join()
+        # # stop workers
+        # for i in range(len(tweets)):
+        #     q.put(None)
+        # print('put none')
+        # for t in threads:
+        #     t.join()
+        # print('threads joined')
 
 
 '''
