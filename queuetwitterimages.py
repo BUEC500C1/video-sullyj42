@@ -3,14 +3,16 @@
 # queue using queue module 
   
   
-import queue 
-import threading
+from multiprocessing import Process, Queue, Pool
+from queue import Empty as qEmpty  # This is messy
 from time import sleep
 from twittertools.tweet_import import tweet_import
 from twittertools.make_word_cloud import word_cloud_from_txt
 from copy import deepcopy
 from os.path import isfile
 from sys import stderr
+from ffmpegencode import ffmpegconverter
+import re
 # Used to save the twitter instances for distributed processing
 '''
     Example of how to wait for enqueued tasks to be completed:
@@ -51,17 +53,18 @@ def do_twitter_analysis(tweet_obj):
     ''' 
     #, image_files=[], summary_file=[]):  # do_work
     # print(f'working ...')
+    print(f'--Woring {tweet_obj.curFolder}--')
     tweet_obj.classify_images()  # Makes requests to Google Vision
     outfile = tweet_obj.write_summaryfile()  # Combines tweets, labels into summary
     if not isfile(outfile):
-        print(f'\n\n--output file ({outfile}) not found--', file=stderr)
-        return
+        print(f'\n\n--output file ({outfile}) not found--')  # , file=stderr)
     else:
         word_cloud_from_txt(outfile)  # 
     # print(f'done')
 
 def work_twitterdata(q):  # worker
     # print('Initiating work')
+    '''
     while True:
         try:
             print('Trying to get item')
@@ -73,6 +76,11 @@ def work_twitterdata(q):  # worker
             print(f'Recieved: {item}')
             do_twitter_analysis(item)
             q.task_done()
+    '''
+    item = q.get()
+    if item is None:
+        return
+    do_twitter_analysis(item)
 
 
 
@@ -89,45 +97,44 @@ class queue_twitter_summary():
     '''
     def __init__(self):
 
-        maxque = 5
-        q = queue.Queue() 
-        threads = []
-        username = 'brabbott42'
-        pages = 5
+        maxque = 10                  # Test values
+        username = 'potus'           # Test values
+        pages = 10                   # Test values
 
-        tweetClass = tweet_import()
-        # a.analyzeUsername('brabbott42', range(0, 1000, 200))
-        '''
-        More user friendly approaches
-        imagesets = []
-        summaries = []
-        outdirs   = []
-        '''
-        tweetobjs = [] # Copy the whole object...
+        tweetClass = tweet_import() # Connect to twitter
+        # q = Queue(maxsize=maxque) 
+        # q = Queue() 
+        # the_pool = Pool(4, work_twitterdata,(q,))
+        the_pool = Pool(10)
+        tweetobjs = []
         for i in range(pages):
+            print(f'\nAnalyzing page {i+1} of {(pages)}\n')
             tweetClass.analyzeUsername(username, tweetcount=10)
             tweetobjs.append(deepcopy(tweetClass))
-            # Grab a 
-            '''
-            More clear approaches
-            # summaries.append(tweetClass.tweet_text)
-            # imagesets.append(tweetClass.images)
-            # outdirs.append(tweetClass.curFolder)
-            # imagesets.append(output.image_files)
-            # summaries.append(output.clean_tweet_file)
-            # This updates the page number incrementally
-            '''
-        '''
-        # Iterative approach (no threads required)
-        for tweet in tweets:
-            do_twitter_analysis()
-        '''
-        threads = []
-        # for i in range(2):
-        #     t = threading.Thread(target=work_twitterdata, args=(q,))
-        #     t.start()
-        #     threads.append(t)
-        # print('Threads created, printing tweet states')
+            # q.put(tweetobjs[-1])
+        # q.close()
+        # q.join_thread()
+        the_pool.map(do_twitter_analysis, tweetobjs)
+        the_pool.close()
+        the_pool.join()
+        videocreator = ffmpegconverter()
+        outdir = re.sub('_iter\\d+', '*/twitter_*.png', tweetobjs[0].curFolder)
+        print(outdir)
+        ff = ffmpegconverter()
+        ff.twitter_to_mpeg4(file_pattern=outdir)
+        # the_pool.close()
+        # the_pool.join()
+
+        # # If we go more than 30 seconds without something, die
+        #     try:
+        #         T = 60
+        #         print(f"Waiting for item from queue for up to {T} seconds")
+        #         i = q.get(True, T)
+        #         print(f'found {i} from the queue !!')
+        #         its.append(i)
+        #     except qEmpty:
+        #         print("Caught queue empty exception, done")
+        #         break
         '''
         for imageFiles in imagesets:
             print(*imageFiles, sep='\n', end='[end]\n')
@@ -138,9 +145,9 @@ class queue_twitter_summary():
                   f'summaries ({len(summaries)}) and images ({len(imagesets)})',
                   file=stderr)
             raise Exception
-        '''
-        for obj in tweetobjs:
-            do_twitter_analysis(obj)
+        # '''
+        # for obj in tweetobjs:
+        #     do_twitter_analysis(obj)
             # q.put(tweet, block=True, timeout=1)
         # print('items placed')
         # # block until all tasks are done
