@@ -1,4 +1,27 @@
-# video-sullyj42
+This repository contains tools to summarize the text and images in a users twitter feed. 
+
+First, install the requirements
+>> pip install requirements.txt
+
+Then, install the python modules. Both the submodule and this module
+>> pip install ./apiDesignSullyj42
+>> pip install .
+
+The tests should explain simple API usage. 
+
+# Queues and multiprocessing
+The largest timesinks in this operation are (in order)
+1. local calls to matplotlib to generate the wordcloud images
+2. network calls to Google Vision API to parse the images
+3. network calls to download the images
+4. network calls to download the twitter text data
+4.a Note these calls have to be performed sequentially as twitter IDs are not simple
+4.b Also have some sketchy overlap settings that are not currently well tested
+
+As such, the current implimentation is to call the twitter api for the desired amount of data, then form a queue with the necessary information for processing. 
+This queue is filled with a multiprocessing information. The multiprocessing task is not locally limited. Errors have formed from socket connection. Currently limiting the number of workers to reduce this, but should also add in error handling to reduce the risk of fatal errors.
+
+# video-sullyj42 -- Specifications
 Main Exercise:  Using the twitter feed, construct a daily video summarizing a twitter handle day
 Convert text into an image in a frame
 Do a sequence of all texts and images in chronological order.
