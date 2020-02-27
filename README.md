@@ -1,6 +1,6 @@
 This repository contains tools to summarize the text and images in a users twitter feed. 
 
-To use, first paste your `keys` file into `apiDesignSullyj42/src/twittertools/tokens.` Then export your google credentials to the appropriate environment variable, or also paste this file into the aforementioned directory.
+To use, first paste your `keys` file into `apiDesignSullyj42/src/twittertools/tokens.` Then export your google credentials to the appropriate environment variable, or also paste this file (`mygooglekeys.json`) into the aforementioned directory.
 
 Then, install the requirements
 ```
