@@ -62,9 +62,12 @@ class ffmpegconverter():
         if not filenames:
             print('Count not find files using: {file_pattern} from {__file__}',
                   file=stderr)
+        else:
+            print(*filenames, sep='\n')
         [self.overlaytext(file) for file in filenames]  # Add a date-overlay
         file_pattern = file_pattern.replace('.png', '_mod.png')
-        outfilename = sub('_iter\\d+', '_summary.mp4', dirname(filenames[1]))
+        # outfilename = sub('_iter\\d+', '_summary.mpeg', dirname(filenames[1]))
+        outfilename = sub('_\\d{8}.*', '_summary.mp4', filenames[1])
         # print(outfilename)
         # sleep(5)
         if isfile(outfilename):

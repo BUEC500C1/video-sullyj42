@@ -22,7 +22,7 @@ num_threads = 4
 threads = []
 
 # build queue
-q = queue.Queue()
+q = queue.Queue(maxsize=10)
 
 def worker():
   while True:
@@ -62,24 +62,26 @@ def worker():
     q.task_done()
 
 
-def makequeue(username='brabbott42',
-              pages=10):
+def makequeue(username='potus',
+              pages=20,
+              tweetcount=200):
     # put items in queue
     twit_obj = tweet_import()
-    for i in range(pages):
-        print(f'Getting info for page {i+1}')
-        twit_obj.analyzeUsername(username, 
-                                tweetcount=20, noverlap=0, 
-                                work_images=False)
-        q.put(deepcopy(twit_obj))
-
-    # how to wait for enqueued tasks to be completed
-    # reference: https://docs.python.org/2/library/queue.html  
     for i in range(num_threads):
       t = threading.Thread(target=worker)
       t.daemon = True
       t.start()
       threads.append(t)
+    for i in range(pages):
+        print(f'Getting info for page {i+1}')
+        twit_obj.analyzeUsername(username, 
+                                tweetcount, noverlap=0, 
+                                work_images=False)
+        q.put(deepcopy(twit_obj))
+
+    # how to wait for enqueued tasks to be completed
+    # reference: https://docs.python.org/2/library/queue.html  
+
     # Blocks until all items in the queue have been gotten and processed.
     q.join() 
 
@@ -115,7 +117,6 @@ if __name__ == '__main__':
     makequeue()
 
     # wordcloud doesn't play nicely with multiprocessing
-    for file in glob('mpresults/*.txt'):
-        wrdcld = word_cloud_from_txt(file)  # Generates an image file
-        imagefilename = wrdcld.out_file
-        ffhelper.overlaytext(imagefilename)
+    [word_cloud_from_txt(file) for file in glob('mpresults/*.txt')]
+    ffhelper.twitter_to_mpeg4(file_pattern='mpresults/twitter_*.png')
+    print('Conversion completed')
