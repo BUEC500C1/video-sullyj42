@@ -29,7 +29,7 @@ class ffmpegconverter():
         '''
         Allows class to be called with various options
         '''
-        if not isdir(filedir):
+        if not isdir(filedir) and filedir != '':
             print(f'An invalid file directory was passed: {filedir}')
             raise FileNotFoundError()
         else:
