@@ -148,6 +148,6 @@ if __name__ == '__main__':
         test = ffmpegconverter(filedir=argv[1], file_pattern=argv[2])
     else:
         print(f'Invalid number of input arguments ({len(argv)})')
-        throw(1)
+        raise Exception
 
     print('done')
