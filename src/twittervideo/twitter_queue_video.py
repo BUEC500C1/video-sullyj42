@@ -15,7 +15,7 @@ import os
 import tempfile
 import shutil
 from ntpath import basename
-from ffmpegencode import ffmpegconverter
+from twittervideo.ffmpegencode import ffmpegconverter
 from glob import glob
 
 num_threads = 4
@@ -41,10 +41,12 @@ def worker():
     # after get all images, then get videos
     # DO ACTUAL WORK HERE
     N=0
-    while N<5:
+    while N<5:  # Retry up to five times
         try:
-            item.work_picture_data(item.urlData)
-            item.classify_images()
+            if item.work_images:
+                print('doing photo work in multiprocessing')
+                item.work_picture_data(item.urlData)
+                item.classify_images()
             outfile = item.write_summaryfile()
             newfile = os.path.join('mpresults')  #, basename(outfile))
             print(outfile)
@@ -63,8 +65,11 @@ def worker():
 
 
 def makequeue(username='potus',
-              pages=20,
-              tweetcount=200):
+              pages=500,
+              tweetcount=50,
+              testList=[],
+              workphotos=False,
+              noverlap=30):
     # put items in queue
     twit_obj = tweet_import()
     for i in range(num_threads):
@@ -72,12 +77,25 @@ def makequeue(username='potus',
       t.daemon = True
       t.start()
       threads.append(t)
-    for i in range(pages):
-        print(f'Getting info for page {i+1}')
-        twit_obj.analyzeUsername(username, 
-                                tweetcount, noverlap=0, 
-                                work_images=False)
-        q.put(deepcopy(twit_obj))
+    if not testList:
+        for i in range(pages):
+            print(f'Getting info for page {i+1} (photos: {workphotos})')
+            try:
+                twit_obj.analyzeUsername(username, 
+                                        tweetcount, noverlap=noverlap, 
+                                        work_images=False)  # Save image work for MP
+            except IndexError:  # If we reach out of the tweet boundaries this can sometimes happen
+                pass
+            newobj = deepcopy(twit_obj)
+            newobj.work_images = workphotos # Do photo work in multiprocessing
+            q.put(newobj)
+            q.put(deepcopy(twit_obj))
+    else:
+        for obj in testList:
+            print('Putting object from the test list into the queue')
+            newobj = deepcopy(obj)
+            newobj.work_images = workphotos # Do photo work in multiprocessing
+            q.put(newobj)
 
     # how to wait for enqueued tasks to be completed
     # reference: https://docs.python.org/2/library/queue.html  
