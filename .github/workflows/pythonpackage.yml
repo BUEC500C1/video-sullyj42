@@ -21,9 +21,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install .
+    - name: Install packages
+      run: sudo apt install ffmpeg
     - name: Lint with flake8
       run: |
-	sudo apt-get install ffmpeg
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
