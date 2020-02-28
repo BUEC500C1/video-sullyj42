@@ -15,7 +15,7 @@ import os
 import tempfile
 import shutil
 from ntpath import basename
-from twittervideo.ffmpegencode import ffmpegconverter
+from ffmpegencode import ffmpegconverter
 from glob import glob
 
 num_threads = 4
@@ -41,12 +41,10 @@ def worker():
     # after get all images, then get videos
     # DO ACTUAL WORK HERE
     N=0
-    while N<5:  # Retry up to five times
+    while N<5:
         try:
-            if item.work_images:
-                print('doing photo work in multiprocessing')
-                item.work_picture_data(item.urlData)
-                item.classify_images()
+            item.work_picture_data(item.urlData)
+            item.classify_images()
             outfile = item.write_summaryfile()
             newfile = os.path.join('mpresults')  #, basename(outfile))
             print(outfile)
@@ -66,6 +64,7 @@ def worker():
 
 def makequeue(username='potus',
 <<<<<<< HEAD
+<<<<<<< HEAD
               pages=500,
               tweetcount=50,
               testList=[],
@@ -76,6 +75,10 @@ def makequeue(username='potus',
               tweetcount=200
               tweetList=[]):
 >>>>>>> 745434e97fe1b0480c9a99d8750f22d03d5491fd
+=======
+              pages=20,
+              tweetcount=200):
+>>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
     # put items in queue
     twit_obj = tweet_import()
     for i in range(num_threads):
@@ -83,6 +86,7 @@ def makequeue(username='potus',
       t.daemon = True
       t.start()
       threads.append(t)
+<<<<<<< HEAD
 <<<<<<< HEAD
     if not testList:
         for i in range(pages):
@@ -118,6 +122,14 @@ def makequeue(username='potus',
                                   work_images=False)
           q.put(deepcopy(twit_obj))
 >>>>>>> 745434e97fe1b0480c9a99d8750f22d03d5491fd
+=======
+    for i in range(pages):
+        print(f'Getting info for page {i+1}')
+        twit_obj.analyzeUsername(username, 
+                                tweetcount, noverlap=0, 
+                                work_images=False)
+        q.put(deepcopy(twit_obj))
+>>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
 
     # how to wait for enqueued tasks to be completed
     # reference: https://docs.python.org/2/library/queue.html  
