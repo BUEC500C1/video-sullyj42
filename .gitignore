@@ -18,3 +18,4 @@ lib*
 *.egg*
 dist/*
 .DS*
+mpresults/*
