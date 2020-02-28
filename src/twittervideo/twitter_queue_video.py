@@ -15,14 +15,14 @@ import os
 import tempfile
 import shutil
 from ntpath import basename
-from ffmpegencode import ffmpegconverter
+from twittervideo.ffmpegencode import ffmpegconverter
 from glob import glob
 
-num_threads = 4
+num_threads = 10
 threads = []
 
 # build queue
-q = queue.Queue(maxsize=10)
+q = queue.Queue(maxsize=20)
 
 def worker():
   while True:
@@ -41,10 +41,12 @@ def worker():
     # after get all images, then get videos
     # DO ACTUAL WORK HERE
     N=0
-    while N<5:
+    while N<5:  # Retry up to five times
         try:
-            item.work_picture_data(item.urlData)
-            item.classify_images()
+            if item.work_images:
+                print('doing photo work in multiprocessing')
+                item.work_picture_data(item.urlData)
+                item.classify_images()
             outfile = item.write_summaryfile()
             newfile = os.path.join('mpresults')  #, basename(outfile))
             print(outfile)
@@ -58,37 +60,15 @@ def worker():
             sleep(5)
             N+=1
     print("Current worker is finished.")
-    
     q.task_done()
 
 
 def makequeue(username='potus',
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
               pages=500,
               tweetcount=50,
               testList=[],
-              workphotos=False,
+              workphotos=True,
               noverlap=30):
-=======
-              pages=20,
-              tweetcount=200
-              tweetList=[]):
->>>>>>> 745434e97fe1b0480c9a99d8750f22d03d5491fd
-=======
-              pages=20,
-              tweetcount=200):
->>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
-=======
-              pages=20,
-              tweetcount=200):
->>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
-=======
-              pages=20,
-              tweetcount=200):
->>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
     # put items in queue
     twit_obj = tweet_import()
     for i in range(num_threads):
@@ -96,10 +76,6 @@ def makequeue(username='potus',
       t.daemon = True
       t.start()
       threads.append(t)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     if not testList:
         for i in range(pages):
             print(f'Getting info for page {i+1} (photos: {workphotos})')
@@ -119,39 +95,6 @@ def makequeue(username='potus',
             newobj = deepcopy(obj)
             newobj.work_images = workphotos # Do photo work in multiprocessing
             q.put(newobj)
-=======
-    if tweetList:
-      # This is useful for offline debugging
-      # Put a list of twitter objects with no image data
-      # Allows tests to be run entirely offline
-      for tweet_obj in tweetlist:
-        q.put(deepcopy(tweet_obj))
-    else:
-      for i in range(pages):
-          print(f'Getting info for page {i+1}')
-          twit_obj.analyzeUsername(username, 
-                                  tweetcount, noverlap=0, 
-                                  work_images=False)
-          q.put(deepcopy(twit_obj))
->>>>>>> 745434e97fe1b0480c9a99d8750f22d03d5491fd
-=======
-=======
->>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
-=======
->>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
-    for i in range(pages):
-        print(f'Getting info for page {i+1}')
-        twit_obj.analyzeUsername(username, 
-                                tweetcount, noverlap=0, 
-                                work_images=False)
-        q.put(deepcopy(twit_obj))
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
-=======
->>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
-=======
->>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
 
     # how to wait for enqueued tasks to be completed
     # reference: https://docs.python.org/2/library/queue.html  
