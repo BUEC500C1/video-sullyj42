@@ -66,6 +66,7 @@ def makequeue(username='potus',
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
               pages=500,
               tweetcount=50,
               testList=[],
@@ -84,6 +85,10 @@ def makequeue(username='potus',
               pages=20,
               tweetcount=200):
 >>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
+=======
+              pages=20,
+              tweetcount=200):
+>>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
     # put items in queue
     twit_obj = tweet_import()
     for i in range(num_threads):
@@ -91,6 +96,7 @@ def makequeue(username='potus',
       t.daemon = True
       t.start()
       threads.append(t)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -131,6 +137,8 @@ def makequeue(username='potus',
 =======
 =======
 >>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
+=======
+>>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
     for i in range(pages):
         print(f'Getting info for page {i+1}')
         twit_obj.analyzeUsername(username, 
@@ -138,6 +146,9 @@ def makequeue(username='potus',
                                 work_images=False)
         q.put(deepcopy(twit_obj))
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
+=======
 >>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
 =======
 >>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
