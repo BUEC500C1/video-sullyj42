@@ -65,6 +65,7 @@ def worker():
 def makequeue(username='potus',
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
               pages=500,
               tweetcount=50,
               testList=[],
@@ -79,6 +80,10 @@ def makequeue(username='potus',
               pages=20,
               tweetcount=200):
 >>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
+=======
+              pages=20,
+              tweetcount=200):
+>>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
     # put items in queue
     twit_obj = tweet_import()
     for i in range(num_threads):
@@ -86,6 +91,7 @@ def makequeue(username='potus',
       t.daemon = True
       t.start()
       threads.append(t)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     if not testList:
@@ -123,12 +129,17 @@ def makequeue(username='potus',
           q.put(deepcopy(twit_obj))
 >>>>>>> 745434e97fe1b0480c9a99d8750f22d03d5491fd
 =======
+=======
+>>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
     for i in range(pages):
         print(f'Getting info for page {i+1}')
         twit_obj.analyzeUsername(username, 
                                 tweetcount, noverlap=0, 
                                 work_images=False)
         q.put(deepcopy(twit_obj))
+<<<<<<< HEAD
+>>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
+=======
 >>>>>>> parent of c4ef3a9... Optional photo work, beginning to add tests
 
     # how to wait for enqueued tasks to be completed
