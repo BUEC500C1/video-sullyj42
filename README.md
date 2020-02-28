@@ -18,9 +18,11 @@ The tests should explain simple API usage.
 # Usage
 There are two main files within the `src/twittervideo` directory. 
 
-`ffmpegconverter` is an api to use ffmpeg for this toolset. It is used as a helper for the next module
+`ffmpegconverter` is an api to use ffmpeg for this toolset. It is used as a helper for the next module.
 
-`queuetwittervideo` sets up a queue and a multiprocessing architecture, saves the image files to a new directory, and creates a video
+`queuetwittervideo` sets up a queue and a multiprocessing architecture, saves the image files to a new directory, and creates a video. Example API usage can be seen in the test code and __main__ interfaces. Note queue and thread sizes may be adjusted machine by machine.
+
+A simple example can be run by just calling `python src/twittervideo/queue_twitter_video.py`.
 
 # Queues and multiprocessing
 The largest timesinks in this operation are (in order)
