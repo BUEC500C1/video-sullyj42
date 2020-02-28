@@ -65,11 +65,17 @@ def worker():
 
 
 def makequeue(username='potus',
+<<<<<<< HEAD
               pages=500,
               tweetcount=50,
               testList=[],
               workphotos=False,
               noverlap=30):
+=======
+              pages=20,
+              tweetcount=200
+              tweetList=[]):
+>>>>>>> 745434e97fe1b0480c9a99d8750f22d03d5491fd
     # put items in queue
     twit_obj = tweet_import()
     for i in range(num_threads):
@@ -77,6 +83,7 @@ def makequeue(username='potus',
       t.daemon = True
       t.start()
       threads.append(t)
+<<<<<<< HEAD
     if not testList:
         for i in range(pages):
             print(f'Getting info for page {i+1} (photos: {workphotos})')
@@ -96,6 +103,21 @@ def makequeue(username='potus',
             newobj = deepcopy(obj)
             newobj.work_images = workphotos # Do photo work in multiprocessing
             q.put(newobj)
+=======
+    if tweetList:
+      # This is useful for offline debugging
+      # Put a list of twitter objects with no image data
+      # Allows tests to be run entirely offline
+      for tweet_obj in tweetlist:
+        q.put(deepcopy(tweet_obj))
+    else:
+      for i in range(pages):
+          print(f'Getting info for page {i+1}')
+          twit_obj.analyzeUsername(username, 
+                                  tweetcount, noverlap=0, 
+                                  work_images=False)
+          q.put(deepcopy(twit_obj))
+>>>>>>> 745434e97fe1b0480c9a99d8750f22d03d5491fd
 
     # how to wait for enqueued tasks to be completed
     # reference: https://docs.python.org/2/library/queue.html  

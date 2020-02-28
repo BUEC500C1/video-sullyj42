@@ -1,17 +1,30 @@
 This repository contains tools to summarize the text and images in a users twitter feed. 
 
-First, install the requirements
->> pip install requirements.txt
+To use, first paste your `keys` file into `apiDesignSullyj42/src/twittertools/tokens.` Then export your google credentials to the appropriate environment variable, or also paste this file (`mygooglekeys.json`) into the aforementioned directory.
 
-Then, install the python modules. Both the submodule and this module
+Then, install the requirements
+```
+>> pip install requirements.txt
+```
+The two local packages (twittertools and twittervideo) may have snuck into the requirements. If those throw warnings or errors, ignore.
+
+Last, install the python modules. Both the submodule and this module
+```
 >> pip install ./apiDesignSullyj42
 >> pip install .
-
+```
 The tests should explain simple API usage. 
+
+# Usage
+There are two main files within the `src/twittervideo` directory. 
+
+`ffmpegconverter` is an api to use ffmpeg for this toolset. It is used as a helper for the next module
+
+`queuetwittervideo` sets up a queue and a multiprocessing architecture, saves the image files to a new directory, and creates a video
 
 # Queues and multiprocessing
 The largest timesinks in this operation are (in order)
-1. local calls to matplotlib to generate the wordcloud images
+1. local calls to matplotlib to generate the wordcloud images (doesn't play nice with threading)
 2. network calls to Google Vision API to parse the images
 3. network calls to download the images
 4. network calls to download the twitter text data
