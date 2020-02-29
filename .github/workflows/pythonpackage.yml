@@ -3,6 +3,18 @@ name: Python package
 on: [push]
 
 jobs:
+  decrypt_secret:
+    name: Decrypt JSON
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Decrypt secret
+        run: |
+          chmod +x ./decrypt_secret.sh
+          ./decrypt_secret.sh
+          cat secrets/googleKeys_jpsullivan_ec500.json
+        env:
+          GOOGLE_PW: ${{secrets.GOOGLE_PW}}
   build:
 
     runs-on: ubuntu-latest
@@ -35,6 +47,13 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
+      env:
+        CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+        CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+        ACCESS_SECRET: ${{ secrets.ACCESS_SECRET }}
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        GOOGLE_PW: ${{secrets.GOOGLE_PW}}
+        GOOGLE_APPLICATION_CREDENTIALS: ./secrets/googleKeys_jpsullivan_ec500.json
       run: |
         pip install pytest
         pytest
