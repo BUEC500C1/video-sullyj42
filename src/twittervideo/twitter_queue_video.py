@@ -17,8 +17,9 @@ import shutil
 from ntpath import basename
 from twittervideo.ffmpegencode import ffmpegconverter
 from glob import glob
+from ntpath import basename
 
-num_threads = 10
+num_threads = 2
 threads = []
 
 # build queue
@@ -49,9 +50,14 @@ def worker():
                 item.classify_images()
             outfile = item.write_summaryfile()
             newfile = os.path.join('mpresults')  #, basename(outfile))
-            print(outfile)
-            print(newfile)
+            # print(outfile)
+            # print(newfile)
             shutil.copy(outfile, newfile)
+            fname = basename(outfile)
+            newfilename = os.path.join(newfile, fname)
+            print(f'\nTrying to make a wordcloud from:{newfilename}\n')
+            # sleep(5)
+            word_cloud_from_txt(newfilename)
             break
         except Exception as e:
             print('Error processing twitter data')
@@ -64,11 +70,11 @@ def worker():
 
 
 def makequeue(username='potus',
-              pages=500,
-              tweetcount=50,
+              pages=30,
+              tweetcount=10,
               testList=[],
               workphotos=True,
-              noverlap=30):
+              noverlap=0):
     # put items in queue
     twit_obj = tweet_import()
     for i in range(num_threads):
@@ -134,6 +140,6 @@ if __name__ == '__main__':
     makequeue()
 
     # wordcloud doesn't play nicely with multiprocessing
-    [word_cloud_from_txt(file) for file in glob('mpresults/*.txt')]
+    # [word_cloud_from_txt(file) for file in glob('mpresults/*.txt')]
     ffhelper.twitter_to_mpeg4(file_pattern='mpresults/twitter_*.png')
     print('Conversion completed')

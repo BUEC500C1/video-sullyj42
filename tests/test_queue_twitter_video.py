@@ -45,7 +45,7 @@ def test_queue_twitter_video_offline():
                   noverlap=0)
 
         # wordcloud doesn't play nicely with multiprocessing
-        [word_cloud_from_txt(file) for file in glob('mpresults/*.txt')]
+        # [word_cloud_from_txt(file) for file in glob('mpresults/*.txt')]
         ffhelper.twitter_to_mpeg4(file_pattern='mpresults/twitter_*.png')
         print('Conversion completed')
         success = True
