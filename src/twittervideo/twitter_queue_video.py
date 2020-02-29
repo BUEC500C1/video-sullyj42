@@ -41,8 +41,9 @@ def worker():
     #do_work(item)
     # after get all images, then get videos
     # DO ACTUAL WORK HERE
-    N=0
-    while N<5:  # Retry up to five times
+    # N=0
+    N1 = 0
+    while N1<5:  # Retry up to five times
         try:
             if item.work_images:
                 print('doing photo work in multiprocessing')
@@ -50,9 +51,11 @@ def worker():
                 item.classify_images()
             outfile = item.write_summaryfile()
             newfile = os.path.join('mpresults')  #, basename(outfile))
+            # sleep(0.5)
             # print(outfile)
             # print(newfile)
             shutil.copy(outfile, newfile)
+            # sleep(0.5)
             # fname = basename(outfile)
             # newfilename = os.path.join(newfile, fname)
             # print(f'\nTrying to make a wordcloud from:{newfilename}\n')
@@ -64,13 +67,13 @@ def worker():
             print(e)
             print('sleeping for 5 seconds and retrying 5 times')
             sleep(5)
-            N+=1
+            N1+=1
     print("Current worker is finished.")
     q.task_done()
 
 
 def makequeue(username='potus',
-              pages=30,
+              pages=10,
               tweetcount=10,
               testList=[],
               workphotos=True,
@@ -94,12 +97,12 @@ def makequeue(username='potus',
             newobj = deepcopy(twit_obj)
             newobj.work_images = workphotos # Do photo work in multiprocessing
             q.put(newobj)
-            q.put(deepcopy(twit_obj))
+            # q.put(deepcopy(twit_obj))
     else:
         for obj in testList:
             print('Putting object from the test list into the queue')
             newobj = deepcopy(obj)
-            newobj.work_images = workphotos # Do photo work in multiprocessing
+            newobj.work_images = False # Do photo work in multiprocessing
             q.put(newobj)
 
     # how to wait for enqueued tasks to be completed
@@ -107,7 +110,7 @@ def makequeue(username='potus',
 
     # Blocks until all items in the queue have been gotten and processed.
     q.join() 
-
+    # t.join()
 
     # put threads in queue
     for i in range(num_threads):

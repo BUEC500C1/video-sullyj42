@@ -60,7 +60,7 @@ class ffmpegconverter():
     def twitter_to_mpeg4(self, file_pattern='./output/*/*/twitter_*.png'):
         filenames = glob.glob(file_pattern)
         if not filenames:
-            print('Count not find files using: {file_pattern} from {__file__}',
+            print(f'Count not find files using: {file_pattern} from {__file__}',
                   file=stderr)
         else:
             print(*filenames, sep='\n')
