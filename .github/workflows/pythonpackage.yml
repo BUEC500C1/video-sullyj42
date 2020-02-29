@@ -9,8 +9,9 @@ jobs:
     strategy:
       matrix:
         python-version: [3.7, 3.8]
-
     steps:
+    - name: Checkout submodules
+    - uses: video-sullyj42/git-checkout-submodule-action@master
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
@@ -21,7 +22,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install .
-        pip install apiDesignSullyj42/
     - name: Install packages
       run: sudo apt install ffmpeg
     - name: Lint with flake8
