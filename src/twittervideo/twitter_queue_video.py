@@ -53,11 +53,11 @@ def worker():
             # print(outfile)
             # print(newfile)
             shutil.copy(outfile, newfile)
-            fname = basename(outfile)
-            newfilename = os.path.join(newfile, fname)
-            print(f'\nTrying to make a wordcloud from:{newfilename}\n')
+            # fname = basename(outfile)
+            # newfilename = os.path.join(newfile, fname)
+            # print(f'\nTrying to make a wordcloud from:{newfilename}\n')
             # sleep(5)
-            word_cloud_from_txt(newfilename)
+            # word_cloud_from_txt(newfilename)
             break
         except Exception as e:
             print('Error processing twitter data')
@@ -140,6 +140,6 @@ if __name__ == '__main__':
     makequeue()
 
     # wordcloud doesn't play nicely with multiprocessing
-    # [word_cloud_from_txt(file) for file in glob('mpresults/*.txt')]
+    [word_cloud_from_txt(file) for file in glob('mpresults/*.txt')]
     ffhelper.twitter_to_mpeg4(file_pattern='mpresults/twitter_*.png')
     print('Conversion completed')
