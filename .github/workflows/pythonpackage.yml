@@ -21,7 +21,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install .
-        pip install apiDesignSullyj42
+        pip install apiDesignSullyj42/
     - name: Install packages
       run: sudo apt install ffmpeg
     - name: Lint with flake8
