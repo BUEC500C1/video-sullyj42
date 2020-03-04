@@ -17,6 +17,7 @@ import shutil
 from ntpath import basename
 from twittervideo.ffmpegencode import ffmpegconverter
 from glob import glob
+from pathlib import Path
 from ntpath import basename
 
 num_threads = 2
@@ -24,6 +25,9 @@ threads = []
 
 # build queue
 q = queue.Queue(maxsize=20)
+
+OUTPATH = Path(__file__)
+OUTDIR = OUTPATH.parent
 
 def worker():
   while True:
@@ -50,7 +54,7 @@ def worker():
                 item.work_picture_data(item.urlData)
                 item.classify_images()
             outfile = item.write_summaryfile()
-            newfile = os.path.join('mpresults')  #, basename(outfile))
+            newfile = os.path.join(OUTDIR, 'mpresults')  #, basename(outfile))
             # sleep(0.5)
             # print(outfile)
             # print(newfile)
@@ -120,7 +124,7 @@ def makequeue(username='potus',
       t.join()
 
 def makeoutputdir():
-    dir_name = "mpresults"
+    dir_name = os.path.join(OUTDIR, "mpresults")
 
     if (os.path.exists(dir_name)):
         # `tempfile.mktemp` Returns an absolute pathname of a file that 
