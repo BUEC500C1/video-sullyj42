@@ -80,6 +80,7 @@ class ffmpegconverter():
             .output(outfilename)
             .run()
         )
+        return outfilename
 
     def overlaytext(self, filename):
         '''

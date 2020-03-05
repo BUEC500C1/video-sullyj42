@@ -20,7 +20,7 @@ from glob import glob
 from pathlib import Path
 from ntpath import basename
 
-num_threads = 2
+num_threads = 1
 threads = []
 
 # build queue
@@ -82,6 +82,8 @@ def makequeue(username='potus',
               testList=[],
               workphotos=True,
               noverlap=0):
+    ffhelper = ffmpegconverter()
+    makeoutputdir()
     # put items in queue
     twit_obj = tweet_import()
     for i in range(num_threads):
@@ -122,6 +124,12 @@ def makequeue(username='potus',
     # join thread in threads list
     for j in threads:
       t.join()
+    textglob = os.path.join(OUTDIR, 'mpresults/*.txt')
+    imageglob = os.path.join(OUTDIR, 'mpresults/twitter_*.png')
+    [word_cloud_from_txt(file) for file in glob(fileglob)]
+    outvid = ffhelper.twitter_to_mpeg4(file_pattern=imageglob)
+
+    return outvid
 
 def makeoutputdir():
     dir_name = os.path.join(OUTDIR, "mpresults")
@@ -142,11 +150,7 @@ def makeoutputdir():
     os.makedirs(dir_name)
 
 if __name__ == '__main__':
-    ffhelper = ffmpegconverter()
-    makeoutputdir()
-    makequeue()
+    outvid = makequeue()
 
     # wordcloud doesn't play nicely with multiprocessing
-    [word_cloud_from_txt(file) for file in glob('mpresults/*.txt')]
-    ffhelper.twitter_to_mpeg4(file_pattern='mpresults/twitter_*.png')
-    print('Conversion completed')
+    print(f'Conversion completed. Video saved at: {outvid}')
