@@ -134,7 +134,7 @@ def makequeue(username='potus',
     outvid = ffhelper.twitter_to_mpeg4(file_pattern=imageglob)
     if outdir:
         shutil.copy(outvid, outdir)
-        outvid = os.path.join(newfile, basename(outvid))
+        outvid = os.path.join(outdir, basename(outvid))
     return outvid
 
 def makeoutputdir():
