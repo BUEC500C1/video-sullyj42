@@ -127,9 +127,9 @@ def makequeue(username='potus',
       t.join()
     textglob = os.path.join(OUTDIR, 'mpresults/*.txt')
     imageglob = os.path.join(OUTDIR, 'mpresults/twitter_*.png')
-    print(textglob)
-    print(imageglob)
-    sleep(5)
+    # print(textglob)
+    # print(imageglob)
+    # sleep(5)
     [word_cloud_from_txt(file) for file in glob(textglob)]
     outvid = ffhelper.twitter_to_mpeg4(file_pattern=imageglob)
     if outdir:

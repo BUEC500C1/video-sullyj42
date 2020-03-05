@@ -8,7 +8,7 @@
 # if __name__ == "__main__":
 #     app.run()
 from twittervideo import twitter_queue_video
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_file
 
 twitterhandles = []  # Empty list of twitter handles to add
 # create the application object
@@ -24,11 +24,17 @@ def hello_world():
 @app.route('/signup', methods = ['POST'])
 def signup():
     handle = request.form['twitterhandle']
+    numpages = int(request.form['numpages'])
+    photos = bool(request.form.get('photos'))
     print("A new twitter handle was added: " + handle)
     twitterhandles.append(handle)
-    outvid = twitter_queue_video.makequeue(username=handle)  # Make this into a queue
+    outvid = twitter_queue_video.makequeue(username=handle,
+                                           pages=numpages,
+                                           workphotos=photos)  # Make this into a queue
     print(f'Recieved processed video at: {outvid}')
-    return redirect('/queueinfo')
+    #return redirect('/queueinfo')
+    return send_file(outvid, as_attachment=True)
+
 
 @app.route('/queueinfo')
 def queueinfo():
