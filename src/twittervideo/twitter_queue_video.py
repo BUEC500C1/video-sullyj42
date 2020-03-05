@@ -77,11 +77,12 @@ def worker():
 
 
 def makequeue(username='potus',
-              pages=10,
+              pages=5,
               tweetcount=10,
               testList=[],
               workphotos=True,
-              noverlap=0):
+              noverlap=0,
+              outdir = ''):
     ffhelper = ffmpegconverter()
     makeoutputdir()
     # put items in queue
@@ -126,9 +127,14 @@ def makequeue(username='potus',
       t.join()
     textglob = os.path.join(OUTDIR, 'mpresults/*.txt')
     imageglob = os.path.join(OUTDIR, 'mpresults/twitter_*.png')
-    [word_cloud_from_txt(file) for file in glob(fileglob)]
+    print(textglob)
+    print(imageglob)
+    sleep(5)
+    [word_cloud_from_txt(file) for file in glob(textglob)]
     outvid = ffhelper.twitter_to_mpeg4(file_pattern=imageglob)
-
+    if outdir:
+        shutil.copy(outvid, outdir)
+        outvid = os.path.join(newfile, basename(outvid))
     return outvid
 
 def makeoutputdir():
