@@ -15,7 +15,18 @@ Last, install the python modules. Both the submodule and this module
 ```
 The tests should explain simple API usage. 
 
+# Web app
+
+A simple web app is written in as a wrapper to this program.
+
+It can be instantiated by `python3 flask_twitter.py`
+
+Then naviagte to the local-host, and provide valid inputs.
+
+Note the workPhotos option will drastically increase the time requirements, I recomment turning it off.
+
 # Usage
+
 There are two main files within the `src/twittervideo` directory. 
 
 `ffmpegconverter` is an api to use ffmpeg for this toolset. It is used as a helper for the next module.
