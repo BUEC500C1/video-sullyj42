@@ -25,15 +25,23 @@ def hello_world():
 def signup():
     handle = request.form['twitterhandle']
     numpages = int(request.form['numpages'])
+    numtweets = int(request.form['numtweets'])
     photos = bool(request.form.get('photos'))
-    print("A new twitter handle was added: " + handle)
+    print(f'A new twitter handle was added: { handle}, pages: {numpages}, ')
     twitterhandles.append(handle)
-    outvid = twitter_queue_video.makequeue(username=handle,
-                                           pages=numpages,
-                                           workphotos=photos)  # Make this into a queue
-    print(f'Recieved processed video at: {outvid}')
-    #return redirect('/queueinfo')
-    return send_file(outvid, as_attachment=True)
+    try:
+        outvid = twitter_queue_video.makequeue(username=handle,
+                                               pages=numpages,
+                                               workphotos=photos,
+                                               tweetcount=numtweets)  # Make this into a queue
+    except Exception as e:
+        print(f'Could not process twitter feed')
+        print(f'Message: {e.message}')
+        return render_template('index.html', author=author, name='Invalid Parameters')
+    else:
+        print(f'Recieved processed video at: {outvid}')
+        #return redirect('/queueinfo')  # Write this later
+        return send_file(outvid, as_attachment=True)
 
 
 @app.route('/queueinfo')
@@ -42,4 +50,6 @@ def queueinfo():
 
 # start the server with the 'run()' method
 if __name__ == '__main__':
-    app.run(debug=True)
+    print('Starting Flask App')
+    app.run(host='0.0.0.0')
+

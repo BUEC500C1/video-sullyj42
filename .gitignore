@@ -7,6 +7,7 @@ images/*
 output/*
 .DS*
 temp*
+!template*
 *.orig # Results from astyle
 *.ORIG # Results from astyle
 !output/examples

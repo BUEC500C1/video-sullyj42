@@ -37,6 +37,7 @@ def worker():
     Q = q.qsize()
     if item is None:
       print("Nothing in queue")
+      return
       N = 0
       break
 
@@ -69,8 +70,8 @@ def worker():
         except Exception as e:
             print('Error processing twitter data')
             print(e)
-            print('sleeping for 5 seconds and retrying 5 times')
-            sleep(5)
+            print('sleeping and retrying 5 times')
+            sleep(1)
             N1+=1
     print("Current worker is finished.")
     q.task_done()
@@ -116,7 +117,7 @@ def makequeue(username='potus',
     # reference: https://docs.python.org/2/library/queue.html  
 
     # Blocks until all items in the queue have been gotten and processed.
-    q.join() 
+    # q.join() 
     # t.join()
 
     # put threads in queue
