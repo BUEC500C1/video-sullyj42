@@ -36,8 +36,8 @@ def signup():
                                                tweetcount=numtweets)  # Make this into a queue
     except Exception as e:
         print(f'Could not process twitter feed')
-        print(f'Message: {e.message}')
-        return render_template('index.html', author=author, name='Invalid Parameters')
+        print(f'Message: {e}')
+        return render_template('index.html', author="Try again", name='Invalid Parameters')
     else:
         print(f'Recieved processed video at: {outvid}')
         #return redirect('/queueinfo')  # Write this later
